@@ -1,0 +1,43 @@
+from pennylane import qchem
+import pennylane as qml
+qml.data.load("qchem", molname="LiH", bondlength=1.57, basis="STO-3G")
+import numpy as np  # Import NumPy for array handling
+
+# Define the symbols and coordinates first
+symbols = ["Li", "H"]  # Example: hydrogen molecule
+coordinates = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 1.57]])  # Convert to NumPy array
+
+# Now create the molecule object
+molecule = qchem.Molecule(symbols, coordinates)
+H, qubits = qchem.molecular_hamiltonian(molecule)
+print("Number of qubits: {:}".format(qubits))
+print("Qubit Hamiltonian")
+print(H)
+charge = 0
+multiplicity = 1
+basis_set = "sto-3g"
+electrons = 4
+orbitals = 4
+# Increase the number of active orbitals to include at least one virtual orbital
+# Since we have 2 active electrons, we need at least 2 active orbitals (1 occupied + 1 virtual)
+core, active = qchem.active_space(electrons, orbitals, active_electrons=2, active_orbitals=2)
+print("List of core orbitals: {:}".format(core))
+print("List of active orbitals: {:}".format(active))
+print("Number of qubits: {:}".format(2 * len(active)))
+molecule = qchem.Molecule(
+    symbols,
+    coordinates,
+    charge=charge,
+    mult=multiplicity,
+    basis_name=basis_set
+)
+
+H, qubits = qchem.molecular_hamiltonian(
+    molecule,
+    active_electrons=2,
+    active_orbitals=2,
+)
+
+print("Number of qubits required to perform quantum simulations: {:}".format(qubits))
+print("Hamiltonian of the Lithium Hydride molecule")
+print(H)
